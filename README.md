@@ -1,2 +1,2 @@
 # umbrellacreatorcli
-Command line tool for creating a umbrella specification
+Command line tool for creating an [Umbrella](http://ccl.cse.nd.edu/software/manuals/umbrella.html) specification
