@@ -1,10 +1,10 @@
 import subprocess
-import click
 import re
+# import click
 
 # Initialize click
-@click.command()
-@click.argument('command')
+# @click.command()
+# @click.argument('command')
 def main(command):
     # Find open libraries by program
     trace = find_open_libraries(command)
@@ -40,5 +40,5 @@ def parse_open_libraries(input):
     # Returns a list of open libraries
     return output
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
