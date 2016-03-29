@@ -1,3 +1,2 @@
 WMI >= 1.4.9
 psutil >= 4.1.0
-python-ptrace >= 0.8.1
