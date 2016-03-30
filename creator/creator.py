@@ -3,12 +3,22 @@ import pprintpp as pp
 import strip
 
 # Initialize click
-@click.command()
+@click.command(context_settings=dict(ignore_unknown_options=True,))
 
 # Main program
-def creator():
+@click.argument('software_command', nargs=-1)
+def creator(software_command):
     umbrella_specification = dict()
-    project_name, project_note = None, None
+
+    # First part of argument should be software name
+    software_name = software_command[0]
+
+    # Get command after calling software
+    command = ''
+    for arg in software_command:
+        if arg is not software_command[0]:
+            part = arg
+            command += part + ' '
 
     print("\nThis is a Umbrella Specification Creation command line tool for software preservation.\n"
           "This program will look for information on your system and determine what information is\n"
@@ -33,18 +43,18 @@ def creator():
     umbrella_specification.update({"os": os})
 
     # Get Software
-    software = strip.get_os()
+    software = strip.get_software(software_name)
     umbrella_specification.update({"software": software})
 
     # Get Data
-    data = strip.get_data()
+    data = strip.get_data(software_command)
     umbrella_specification.update({"data": data})
 
     # Get Environmental Variables
     environ = strip.get_environ()
-    # pp.pprint(environ)
+    pp.pprint(environ)
 
-    pp.pprint(umbrella_specification)
+    # pp.pprint(umbrella_specification)
 
     if click.confirm("Would you like to edit your environmental variables?"):
         new_environ = strip.edit_environ(environ)

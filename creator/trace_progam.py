@@ -5,7 +5,7 @@ import re
 # Initialize click
 # @click.command()
 # @click.argument('command')
-def main(command):
+def get_calls(command):
     # Find open libraries by program
     trace = find_open_libraries(command)
     # Parse output to return only string
@@ -41,4 +41,4 @@ def parse_open_libraries(input):
     return output
 
 # if __name__ == "__main__":
-#     main()
+#     get_calls()

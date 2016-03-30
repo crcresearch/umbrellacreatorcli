@@ -4,7 +4,7 @@ from psutil import virtual_memory
 import platform, sys, ld, urllib, os, tarfile, multiprocessing, math, re
 import pprintpp as pp
 from umbrella import get_md5_and_file_size
-
+import trace_program
 
 # Project
 def get_project():
@@ -73,7 +73,7 @@ def get_os():
         name = platform.system() + ' ' + platform.mac_ver()[0]
         version = platform.mac_ver()[0]
 
-    format = click.prompt("Please enter file format of the operating system install file: ", default="tgz",
+    format = click.prompt("Please enter file format of the operating system install file (tgz or plain): ", default="tgz",
                           show_default=True)
     action = click.prompt("Please enter the file action (unpack or none): ", default="unpack", show_default=True)
     uncompressed_size = click.prompt("Please enter the uncompressed size of the: ")
@@ -105,7 +105,11 @@ def get_os():
 
 # Software
 def get_software(package):
-    software = {}
+    software = {
+        package: {
+
+        }
+    }
     return software
 
 # Environmental Variables
@@ -129,16 +133,18 @@ def edit_environ(original):
     path = click.prompt("Please enter PATH: ", default=environ_variables['PATH'], show_default=False)
     pwd = click.prompt("Please enter PWD: ", default=environ_variables['PWD'], show_default=False)
 
-    if path is ('None' or 'none' or 'NONE'):
+
+
+    if path == ('None' or 'none' or 'NONE'):
         path = None
-        environ_variables.pop('PATH', path)
+        environ_variables.pop('PATH')
     else:
         environ_variables['PATH'] = path
         pp.pprint(environ_variables)
 
-    if pwd is ('None' or 'none' or 'NONE'):
+    if pwd == ('None' or 'none' or 'NONE'):
         pwd = None
-        environ_variables.pop('PWD', pwd)
+        environ_variables.pop('PWD')
     else:
         environ_variables['PWD'] = pwd
         pp.pprint(environ_variables)
@@ -158,7 +164,11 @@ def edit_environ(original):
     return environ_variables
 
 # Data
-def get_data():
+def get_data(software_command):
+    open_files = trace_program.get_calls(software_command)
+
+    print open_files
+
     data = {}
     return data
 
