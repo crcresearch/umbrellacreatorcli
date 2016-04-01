@@ -133,17 +133,13 @@ def edit_environ(original):
     path = click.prompt("Please enter PATH: ", default=environ_variables['PATH'], show_default=False)
     pwd = click.prompt("Please enter PWD: ", default=environ_variables['PWD'], show_default=False)
 
-
-
     if path == ('None' or 'none' or 'NONE'):
-        path = None
         environ_variables.pop('PATH')
     else:
         environ_variables['PATH'] = path
         pp.pprint(environ_variables)
 
     if pwd == ('None' or 'none' or 'NONE'):
-        pwd = None
         environ_variables.pop('PWD')
     else:
         environ_variables['PWD'] = pwd
@@ -159,17 +155,36 @@ def edit_environ(original):
 
         option = click.confirm("Would you like to add another environmental variable?")
 
-    pp.pprint(environ_variables)
+    # pp.pprint(environ_variables)
 
     return environ_variables
 
 # Data
-def get_data(software_command):
-    open_files = trace_program.get_calls(software_command)
-
-    print open_files
-
+def get_data(command):
+    distro = ld.name(pretty=False)
+    data_paths = []
     data = {}
+    open_files = trace_program.get_calls(command)
+    results = trace_program.package_status(open_files, distro)
+
+    for path in results:
+        if path == None:
+            data_paths.append(path)
+
+    data_list = strip_files(data_paths)
+
+    for file in data_list:
+        data =  {
+            file: {
+                "format": "plain",
+                "checksum": "checksum",
+                "source": [],
+                "mountpoint": "/tmp/" + file,
+                "id": "checksum",
+                "size": "file_size"
+            }
+        }
+
     return data
 
 def get_uncompressed_size(gzfile):
@@ -184,3 +199,12 @@ def get_uncompressed_size(gzfile):
 
     print uncompressed_size
 
+# Function to strip out only the files from a path
+def strip_files(paths):
+    c_files = []
+    for file in paths:
+        c_file = os.path.basename(os.path.normpath(file))
+        c_files.append(c_file)
+
+    # Return the files without paths
+    return c_files
