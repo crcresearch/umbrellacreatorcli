@@ -160,15 +160,16 @@ def edit_environ(original):
     return environ_variables
 
 # Data
-def get_data(command, software):
-    distro = ld.name(pretty=False)
+def get_data(file_results, software):
+    # distro = ld.name(pretty=False)
     data_paths = []
     data = {}
-    open_files = trace_program.get_calls(command, file_type='O_RDONLY')
-    results = trace_program.package_status(open_files, distro)
-    print results # test
+    # open_files = trace_program.get_calls(command, file_type='O_RDONLY')
+    # results = trace_program.package_status(open_files, distro)
 
-    for path, value in results.items():
+    # print results # test
+
+    for path, value in file_results.items():
         print value # test
         if value == None:
             data_paths.append(path)
@@ -195,6 +196,44 @@ def get_data(command, software):
         }
 
     return data
+
+def get_pm(file_results, software):
+    package_paths = []
+    packages = {}
+    # open_files = trace_program.get_calls(command, file_type='O_RDONLY')
+    # results = trace_program.package_status(open_files, distro)
+
+    # print results # test
+
+    for path, value in file_results.items():
+        print value  # test
+        if value != None and value != False:
+            package_paths.append(value)
+
+    # pm_list = strip_files(package_paths)
+    # print pm_list  # test
+
+    print software  # test
+    # Check for software file
+    # while software in pm_list:
+    #     pm_list.remove(software)
+    # print pm_list  # test
+
+
+    packages = {
+        "config": {},
+        "list": " ".join(package_paths),
+        "name": "yum"
+    }
+
+    return packages
+
+def get_open_files(command):
+    distro = ld.name(pretty=False)
+    open_files = trace_program.get_calls(command, file_type='O_RDONLY')
+    results = trace_program.package_status(open_files, distro)
+
+    return results
 
 def get_uncompressed_size(gzfile):
     uncompressed_size = 0

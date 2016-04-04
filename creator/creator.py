@@ -27,6 +27,7 @@ def creator(software_command):
     print("\nThis is a Umbrella Specification Creation command line tool for software preservation.\n"
           "This program will look for information on your system and determine what information is\n"
           "needed for writing a Umbrella Specification file.\n")
+    file_results = strip.get_open_files(c_command)
 
     # Get Project Name and Description
     project = strip.get_project()
@@ -51,8 +52,12 @@ def creator(software_command):
     umbrella_specification.update({"software": software})
 
     # Get Data
-    data = strip.get_data(c_command, software_name)
+    data = strip.get_data(file_results, software_name)
     umbrella_specification.update({"data": data})
+
+    # Get Package Manager
+    pm = strip.get_pm(file_results, software_name)
+    umbrella_specification.update({"package_manager": pm})
 
     # Get Environmental Variables
     environ = strip.get_environ()
