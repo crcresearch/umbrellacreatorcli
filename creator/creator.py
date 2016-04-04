@@ -8,7 +8,7 @@ import strip
 # Main program
 @click.argument('software_command', nargs=-1)
 def creator(software_command):
-    print(software_command)
+    # print(software_command) # test
     umbrella_specification = dict()
 
     # First part of argument should be software name
@@ -22,7 +22,7 @@ def creator(software_command):
             command += part + ' '
 
     c_command = software_name + command
-    print(c_command)
+    # print(c_command) # test
 
     print("\nThis is a Umbrella Specification Creation command line tool for software preservation.\n"
           "This program will look for information on your system and determine what information is\n"

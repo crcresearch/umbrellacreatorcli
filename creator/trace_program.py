@@ -32,35 +32,44 @@ def find_open_libraries(command):
     p = subprocess.Popen(call, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
     p.wait()
     trace = p.stdout.read().split('\n')
-    # print(trace) # test
 
     # Return the results from strace
     return trace
 
 # Function to strip string from quotes
-def parse_open_libraries(input, file_type):
+def parse_open_libraries(calls, file_type):
     # Check for O_RDONLY or O_WRONLY
     # Get RDONLY or WRONLY files from system call
-    print input # test
-    for i, item in enumerate(input):
+    # print(input) # test
+    file_list = []
+
+    # print(file_type) # test
+    for i, item in enumerate(calls):
         # print(item) # test
         if file_type == 'O_WRONLY':
             if 'O_WRONLY' not in item:
-                input.pop(i)
+                continue
             else:
+                # print(item)  # test
                 new_value = re.findall('"([^"]*)"', item)
-                input[i] = new_value[0]
+                file_list.append(new_value[0])
 
         elif file_type == 'O_RDONLY':
             if 'O_RDONLY' not in item:
-                input.pop(i)
+                continue
+            elif 'O_RDWR' in item:
+                # This is specifically for unknown file types e.g.: /dev/tty
+                # TODO: Will revisit this at some point
+                continue
             else:
+                # print(item)  # test
                 new_value = re.findall('"([^"]*)"', item)
-                input[i] = new_value[0]
+                # print('New Value: ' + new_value[0]) # test
+                file_list.append(new_value[0])
 
-    print input # test
+    # print(file_list) # test
 
-    return input
+    return file_list
 
 # Function to find out if files are from a package or are data files
 def package_status(paths, os):
@@ -81,8 +90,8 @@ def package_status(paths, os):
     for i, path in enumerate(paths):
         s = subprocess.Popen(command + path, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
         trace = s.stdout.read().replace('\n', '')
-        print('Path: ' + path) # test
-        print('Trace: ' + trace) # test
+        # print('Path: ' + path) # test
+        # print('Trace: ' + trace) # test
         results.update({
             path: trace
         })
@@ -101,26 +110,26 @@ def package_status(paths, os):
 
         return f_results
     elif os == 'Manjaro Linux':
-        print 'start'
+        # print('start') # test
         for key, value in results.items():
-            print key # test
-            print value # test
+            # print(key) # test
+            # print(value) # test
             # Check for duplicates
             if value not in f_results.values():
                 # Check for errors
                 if value == 'error: No package owns ' + key:
                     f_results[key] = None
-                    print '1 ' + str(f_results)
+                    # print('1 ' + str(f_results)) # test
                 elif (value == 'error: failed to read file \'' + key + '\': No such file or directory') \
                         or (value == 'error: failed to find \'' + key + '\' in PATH: No such file or directory'):
                     f_results[key] = False
-                    print '2 ' + str(f_results)
+                    # print('2 ' + str(f_results))
                 # If no errors
                 else:
                     new_value = value.split(' ')
                     f_value = new_value[-2] + '-' + new_value[-1]
                     f_results[key] = f_value
-                    print '3 ' + str(f_results)
+                    # print('3 ' + str(f_results))
     else:
         return f_results
 

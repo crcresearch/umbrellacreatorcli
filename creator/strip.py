@@ -47,13 +47,13 @@ def get_hardware():
     disk = actual_disk_size
     arch = platform.machine()
     memory = virtual_memory()
-    actual_memory = memory.total
+    actual_memory = math.ceil(memory.total/1.073741824e9)
 
     hardware = {
-        "cores": cores,
-        "disk": disk,
+        "cores": int(cores),
+        "disk": unicode(int(disk)) + 'GB',
         "arch": arch,
-        "memory": actual_memory
+        "memory": unicode(int(actual_memory)) + 'GB'
     }
 
     return hardware
@@ -161,27 +161,24 @@ def edit_environ(original):
 
 # Data
 def get_data(file_results, software):
-    # distro = ld.name(pretty=False)
     data_paths = []
     data = {}
-    # open_files = trace_program.get_calls(command, file_type='O_RDONLY')
-    # results = trace_program.package_status(open_files, distro)
 
-    # print results # test
+    # print(file_results) # test
 
     for path, value in file_results.items():
-        print value # test
+        # print(value) # test
         if value == None:
             data_paths.append(path)
 
     data_list = strip_files(data_paths)
-    print data_list # test
+    # print(data_list) # test
 
-    print software # test
+    # print(software) # test
     # Check for software file
     while software in data_list:
         data_list.remove(software)
-    print data_list # test
+    # print(data_list) # test
 
     for file in data_list:
         data =  {
@@ -199,26 +196,15 @@ def get_data(file_results, software):
 
 def get_pm(file_results, software):
     package_paths = []
-    packages = {}
-    # open_files = trace_program.get_calls(command, file_type='O_RDONLY')
-    # results = trace_program.package_status(open_files, distro)
 
     # print results # test
 
     for path, value in file_results.items():
-        print value  # test
+        # print value  # test
         if value != None and value != False:
             package_paths.append(value)
 
-    # pm_list = strip_files(package_paths)
-    # print pm_list  # test
-
-    print software  # test
-    # Check for software file
-    # while software in pm_list:
-    #     pm_list.remove(software)
-    # print pm_list  # test
-
+    # print(software)  # test
 
     packages = {
         "config": {},
@@ -230,11 +216,12 @@ def get_pm(file_results, software):
 
 def get_open_files(command):
     distro = ld.name(pretty=False)
-    open_files = trace_program.get_calls(command, file_type='O_RDONLY')
+    open_files = trace_program.get_calls(command)
     results = trace_program.package_status(open_files, distro)
 
     return results
 
+# Function for getting uncompressed_size
 def get_uncompressed_size(gzfile):
     uncompressed_size = 0
     if(gzfile.endswith("tar.gz")):
@@ -243,9 +230,9 @@ def get_uncompressed_size(gzfile):
         uncompressed_size = sum(file.file_size for file in tar.infolist())
         tar.close()
     else:
-        print "Not a tar.gz file: '%s '" % sys.argv[0]
+        print("Not a tar.gz file: '%s '" % sys.argv[0])
 
-    print uncompressed_size
+    print(uncompressed_size)
 
 # Function to strip out only the files from a path
 def strip_files(paths):
