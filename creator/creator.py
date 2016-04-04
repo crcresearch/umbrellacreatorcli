@@ -51,7 +51,7 @@ def creator(software_command):
     umbrella_specification.update({"software": software})
 
     # Get Data
-    data = strip.get_data(c_command)
+    data = strip.get_data(c_command, software_name)
     umbrella_specification.update({"data": data})
 
     # Get Environmental Variables

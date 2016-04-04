@@ -160,18 +160,27 @@ def edit_environ(original):
     return environ_variables
 
 # Data
-def get_data(command):
+def get_data(command, software):
     distro = ld.name(pretty=False)
     data_paths = []
     data = {}
-    open_files = trace_program.get_calls(command)
+    open_files = trace_program.get_calls(command, file_type='O_RDONLY')
     results = trace_program.package_status(open_files, distro)
+    print results # test
 
-    for path in results:
-        if path == None:
+    for path, value in results.items():
+        print value # test
+        if value == None:
             data_paths.append(path)
 
     data_list = strip_files(data_paths)
+    print data_list # test
+
+    print software # test
+    # Check for software file
+    while software in data_list:
+        data_list.remove(software)
+    print data_list # test
 
     for file in data_list:
         data =  {
