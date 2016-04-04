@@ -41,6 +41,7 @@ def find_open_libraries(command):
 def parse_open_libraries(input, file_type):
     # Check for O_RDONLY or O_WRONLY
     # Get RDONLY or WRONLY files from system call
+    print input # test
     for i, item in enumerate(input):
         # print(item) # test
         if file_type == 'O_WRONLY':
