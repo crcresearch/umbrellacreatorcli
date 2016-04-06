@@ -8,11 +8,13 @@ import os
 # @click.argument('command')
 def get_calls(command, file_type='O_RDONLY'):
     # Find open libraries by program
+    # print(command) # test
     trace = find_open_libraries(command)
+    # print(trace) # test
     # Parse output to return only string
     output = parse_open_libraries(trace, file_type)
 
-    # Print list
+    # # Print list # test
     # for list in output:
     #     print(list) # test
 
