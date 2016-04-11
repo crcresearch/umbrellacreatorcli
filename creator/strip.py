@@ -296,8 +296,10 @@ class CreateUmbrellaSpecification:
 
         option = click.confirm("\nWould you like to add more output files or directories?")
         while option:
-            new_file = click.prompt("Please enter another output file (including path)", default='None', show_default=True)
-            new_directory = click.prompt("Please enter a output directory", default='None', show_default=True)
+            new_file = click.prompt("Please enter another output file (including path)", default='None',
+                                    show_default=True)
+            new_directory = click.prompt("Please enter a output directory", default='None',
+                                         show_default=True)
 
             if new_file is not 'None':
                 self.specification['output']['files'].append(new_file)
