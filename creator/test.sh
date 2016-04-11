@@ -1,3 +1,3 @@
 #!/bin/bash
-
-echo "123" >> test.txt
+myPath=/tmp
+echo "123" >> ${myPath}/test.txt

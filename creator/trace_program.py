@@ -1,25 +1,28 @@
 import subprocess
 import re
-import os
 # import click
+
 
 # Initialize click
 # @click.command()
 # @click.argument('command')
 def get_calls(command, file_type='O_RDONLY'):
     # Find open libraries by program
-    # print(command) # test
     trace = find_open_libraries(command)
-    # print(trace) # test
     # Parse output to return only string
-    output = parse_open_libraries(trace, file_type)
+    if file_type is 'O_RDONLY':
+        output = parse_open_libraries(trace, file_type)
+    elif file_type is 'O_WRONLY':
+        output = parse_open_libraries(trace, file_type)
+    else:
+        output = None
 
     # # Print list # test
     # for list in output:
     #     print(list) # test
 
-    # print(output) # test
     return output
+
 
 # Function to only return open libraries from strace
 def find_open_libraries(command):
@@ -38,25 +41,22 @@ def find_open_libraries(command):
     # Return the results from strace
     return trace
 
+
 # Function to strip string from quotes
 def parse_open_libraries(calls, file_type):
     # Check for O_RDONLY or O_WRONLY
     # Get RDONLY or WRONLY files from system call
-    # print(input) # test
     file_list = []
 
-    # print(file_type) # test
     for i, item in enumerate(calls):
-        # print(item) # test
-        if file_type == 'O_WRONLY':
+        if file_type is 'O_WRONLY':
             if 'O_WRONLY' not in item:
                 continue
             else:
-                # print(item)  # test
                 new_value = re.findall('"([^"]*)"', item)
                 file_list.append(new_value[0])
 
-        elif file_type == 'O_RDONLY':
+        elif file_type is 'O_RDONLY':
             if 'O_RDONLY' not in item:
                 continue
             elif 'O_RDWR' in item:
@@ -64,14 +64,11 @@ def parse_open_libraries(calls, file_type):
                 # TODO: Will revisit this at some point
                 continue
             else:
-                # print(item)  # test
                 new_value = re.findall('"([^"]*)"', item)
-                # print('New Value: ' + new_value[0]) # test
                 file_list.append(new_value[0])
 
-    # print(file_list) # test
-
     return file_list
+
 
 # Function to find out if files are from a package or are data files
 def package_status(paths, os):
@@ -92,8 +89,6 @@ def package_status(paths, os):
     for i, path in enumerate(paths):
         s = subprocess.Popen(command + path, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
         trace = s.stdout.read().replace('\n', '')
-        # print('Path: ' + path) # test
-        # print('Trace: ' + trace) # test
         results.update({
             path: trace
         })
@@ -112,16 +107,12 @@ def package_status(paths, os):
 
         return f_results
     elif os == 'Manjaro Linux':
-        # print('start') # test
         for key, value in results.items():
-            # print(key) # test
-            # print(value) # test
             # Check for duplicates
-            if value not in f_results.values():
+            if value != f_results.values():
                 # Check for errors
                 if value == 'error: No package owns ' + key:
                     f_results[key] = None
-                    # print('1 ' + str(f_results)) # test
                 elif (value == 'error: failed to read file \'' + key + '\': No such file or directory') \
                         or (value == 'error: failed to find \'' + key + '\' in PATH: No such file or directory'):
                     f_results[key] = False

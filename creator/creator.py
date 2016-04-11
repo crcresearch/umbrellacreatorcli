@@ -1,38 +1,34 @@
 import click
 import pprintpp as pp
-from strip import CreateUmbrellaSpecification, get_open_files
+from strip import CreateUmbrellaSpecification
+
 
 # Initialize click
 @click.command(context_settings=dict(ignore_unknown_options=True,))
-
 # Main program
 @click.argument('software_command', nargs=-1)
 def creator(software_command):
-    # print(software_command) # test
-
     # First part of argument should be software name
-    # software_name = software_command[0]
-    #
-    # # Get command after calling software
-    # command = ''
-    # for arg in software_command:
-    #     if arg is not software_command[0]:
-    #         part = arg
-    #         command += part + ' '
-    #
-    # c_command = software_name + command
-    # print(c_command) # test
+    software_name = software_command[0]
 
-    umbrella = CreateUmbrellaSpecification(command=software_command)
+    # Get command after calling software
+    command = ''
+    for arg in software_command:
+        if arg is not software_command[0]:
+            part = arg
+            command += part + ' '
+
+    c_command = software_name + ' ' + command
+
+    umbrella = CreateUmbrellaSpecification(software=software_name, command=c_command)
 
     print("\nThis is a Umbrella Specification Creation command line tool for software preservation.\n"
           "This program will look for information on your system and determine what information is\n"
-          "needed for writing a Umbrella Specification file.\n")
+          "needed for writing a Umbrella Specification file.")
     # file_results = get_open_files(c_command)
 
     # Get Project Name and Description
     umbrella.get_project()
-    umbrella.get_os()
 
     # umbrella_specification['comment'] = project['name']
     # umbrella_specification['note'] = project['note']
@@ -46,10 +42,12 @@ def creator(software_command):
     # umbrella_specification.update({"hardware": hardware})
 
     # Get Operating System
+    umbrella.get_os()
     # os = strip.get_os()
     # umbrella_specification.update({"os": os})
 
     # Get Software
+    umbrella.get_software()
     # software = strip.get_software(software_name)
     # umbrella_specification.update({"software": software})
 
@@ -65,14 +63,15 @@ def creator(software_command):
     umbrella.get_environ()
     pp.pprint(umbrella.specification)
 
+    # Edit Output Section
+    umbrella.edit_output()
+
     # pp.pprint(umbrella_specification)
 
     if click.confirm("Would you like to edit your environmental variables?"):
         umbrella.edit_environ()
-    else:
-        umbrella_specification.update({"environ": environ})
 
-    pp.pprint(umbrella_specification)
+    pp.pprint(umbrella.specification)
 
 if __name__ == "__main__":
     creator()
