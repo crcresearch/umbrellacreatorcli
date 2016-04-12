@@ -7,12 +7,18 @@ import re
 # @click.command()
 # @click.argument('command')
 def get_calls(command, file_type='O_RDONLY'):
-    # Find open libraries by program
-    trace = find_open_libraries(command)
     # Parse output to return only string
     if file_type is 'O_RDONLY':
+        # Find open libraries by program
+        trace = find_open_libraries(command)
         output = parse_open_libraries(trace, file_type)
     elif file_type is 'O_WRONLY':
+        # Find open libraries by program
+        trace = find_open_libraries(command)
+        output = parse_open_libraries(trace, file_type)
+    elif file_type is 'software':
+        # Find open libraries by program
+        trace = find_software_path(command)
         output = parse_open_libraries(trace, file_type)
     else:
         output = None
@@ -30,6 +36,24 @@ def find_open_libraries(command):
     strace = "strace"
     # Use grep to search for all instances of 'open('
     open_calls = '2>&1|grep "open("'
+    # Complete the command
+    call = strace + ' ' + command + ' ' + open_calls
+
+    # Run strace through pythons subprocess library
+    p = subprocess.Popen(call, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    p.wait()
+    trace = p.stdout.read().split('\n')
+
+    # Return the results from strace
+    return trace
+
+
+# Function to find software path
+def find_software_path(command):
+    # Establish strace command
+    strace = "strace"
+    # Use grep to search for all instances of 'open('
+    open_calls = '2>&1|grep "execve("'
     # Complete the command
     call = strace + ' ' + command + ' ' + open_calls
 
@@ -67,7 +91,15 @@ def parse_open_libraries(calls, file_type):
                 new_value = re.findall('"([^"]*)"', item)
                 file_list.append(new_value[0])
 
+        elif file_type is 'software':
+            if 'execve' in item:
+                new_value = re.findall('"([^"]*)"', item)
+                file_list.append(new_value[0])
+
     return file_list
+
+
+# Function to strip string from quotes
 
 
 # Function to find out if files are from a package or are data files
@@ -116,13 +148,11 @@ def package_status(paths, os):
                 elif (value == 'error: failed to read file \'' + key + '\': No such file or directory') \
                         or (value == 'error: failed to find \'' + key + '\' in PATH: No such file or directory'):
                     f_results[key] = False
-                    # print('2 ' + str(f_results))
                 # If no errors
                 else:
                     new_value = value.split(' ')
                     f_value = new_value[-2] + '-' + new_value[-1]
                     f_results[key] = f_value
-                    # print('3 ' + str(f_results))
     else:
         return f_results
 
